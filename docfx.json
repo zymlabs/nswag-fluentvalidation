@@ -1,0 +1,38 @@
+{
+    "metadata": [
+      {
+        "src": [
+          {
+            "files": [ "../*.sln", "**/*.csproj" ],
+            "exclude": [ "**/bin/**", "**/obj/**" ],
+            "src": "src"
+          }
+        ],
+        "dest": "obj/docfx/api"
+      }
+    ],
+    "build": {
+      "content": [
+        {
+          "files": [ "**/*.yml" ],
+          "src": "obj/docfx/api",
+          "dest": "api"
+        },
+        {
+          "files": [ "*.md", "docs/**/*.md", "toc.yml" ]
+        }
+      ],
+      "resource": [
+        {
+          "files": [ "docs/images/**"]
+        }
+      ],
+      "overwrite": "specs/*.md",
+      "globalMetadata": {
+        "_enableSearch": true
+      },
+      "markdownEngineName": "markdig",
+      "dest": "_site",
+      "xrefService": [ "https://xref.docs.microsoft.com/query?uid={uid}" ]
+    }
+  }

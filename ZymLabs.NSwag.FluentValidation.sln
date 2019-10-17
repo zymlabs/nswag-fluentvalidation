@@ -1,0 +1,24 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{38396F1E-AAB0-42C7-9D46-617C5DD42674}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZymLabs.NSwag.FluentValidation", "src\ZymLabs.NSwag.FluentValidation\ZymLabs.NSwag.FluentValidation.csproj", "{AAB60A97-EFC3-41A9-9725-696D769B634E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{7C637D0D-E3FE-4FA6-AF2B-F70FBCECD916}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AAB60A97-EFC3-41A9-9725-696D769B634E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAB60A97-EFC3-41A9-9725-696D769B634E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAB60A97-EFC3-41A9-9725-696D769B634E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAB60A97-EFC3-41A9-9725-696D769B634E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AAB60A97-EFC3-41A9-9725-696D769B634E} = {38396F1E-AAB0-42C7-9D46-617C5DD42674}
+	EndGlobalSection
+EndGlobal

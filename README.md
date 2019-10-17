@@ -5,6 +5,7 @@ Use FluentValidation rules instead of ComponentModel attributes to define swagge
 ## Statuses
 
 [![License](https://img.shields.io/github/license/zymlabs/nswag-fluentvalidation.svg)](https://raw.githubusercontent.com/zymlabs/nswag-fluentvalidation/master/LICENSE)
+[![CircleCI](https://circleci.com/gh/zymlabs/nswag-fluentvalidation.svg?style=svg)](https://circleci.com/gh/zymlabs/nswag-fluentvalidation)
 
 ## Usage
 

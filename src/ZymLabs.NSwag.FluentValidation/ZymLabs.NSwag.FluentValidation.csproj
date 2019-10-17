@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Use FluentValidation rules instead of ComponentModel attributes to define swagger schema.
+</Description>
+    <Copyright>Copyright (c) 2019 Zym Labs LLC</Copyright>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/zymlabs/nswag-fluentvalidation/master/LICENSE</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/zymlabs/nswag-fluentvalidation.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>nswag; fluentvalidation; swagger</PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DocumentationFile>bin\Debug\ZymLabs.NSwag.FluentValidation.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DocumentationFile>bin\Release\ZymLabs.NSwag.FluentValidation.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="8.5.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="1.1.2" />
+    <PackageReference Include="NJsonSchema" Version="10.0.27" />
+  </ItemGroup>
+
+</Project>

@@ -36,21 +36,6 @@ public void ConfigureServices(IServiceCollection services)
     // Add the FluentValidationSchemaProcessor as a singleton
     services.AddSingleton<FluentValidationSchemaProcessor>();
 }
-
-// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-{
-    app
-        .UseMvc()
-        // Adds swagger
-        .UseSwagger();
-
-    // Adds swagger UI
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-    });
-}
 ```
 
 ## Supported validators

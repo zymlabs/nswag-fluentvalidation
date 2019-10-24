@@ -21,16 +21,12 @@ dotnet add package ZymLabs.NSwag.FluentValidation
 // This method gets called by the runtime. Use this method to add services to the container.
 public void ConfigureServices(IServiceCollection services)
 {
-    services.AddOpenApiDocument(document =>
+    services.AddOpenApiDocument((settings, serviceProvider)) =>
     {
-        // Hack to pass the dependencies to the FluentValidationSchemaProcessor, 
-        // I'm open to a better suggestion to add the schema processor
-        // Build the intermediate service provider
-        var sp = services.BuildServiceProvider();
-        var fluentValidationSchemaProcessor = sp.GetService<FluentValidationSchemaProcessor>();
+        var fluentValidationSchemaProcessor = serviceProvider.GetService<FluentValidationSchemaProcessor>();
 
         // Add the fluent validations schema processor
-        document.SchemaProcessors.Add(fluentValidationSchemaProcessor);
+        settings.SchemaProcessors.Add(fluentValidationSchemaProcessor);
     });
 
     // Add the FluentValidationSchemaProcessor as a singleton

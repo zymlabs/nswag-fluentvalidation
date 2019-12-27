@@ -211,7 +211,8 @@ namespace ZymLabs.NSwag.FluentValidation
                             }
                             else if (comparisonValidator.Comparison == Comparison.GreaterThan)
                             {
-                                schemaProperty.ExclusiveMinimum = valueToCompare;
+                                schemaProperty.Minimum = valueToCompare;
+                                schemaProperty.IsExclusiveMinimum = true;
                             }
                             else if (comparisonValidator.Comparison == Comparison.LessThanOrEqual)
                             {
@@ -219,7 +220,8 @@ namespace ZymLabs.NSwag.FluentValidation
                             }
                             else if (comparisonValidator.Comparison == Comparison.LessThan)
                             {
-                                schemaProperty.ExclusiveMaximum = valueToCompare;
+                                schemaProperty.Maximum = valueToCompare;
+                                schemaProperty.IsExclusiveMaximum = true;
                             }
                         }
                     }

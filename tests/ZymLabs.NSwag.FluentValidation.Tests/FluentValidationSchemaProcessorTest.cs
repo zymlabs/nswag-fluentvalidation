@@ -47,6 +47,7 @@ namespace ZymLabs.NSwag.FluentValidation.Tests
 
             // Assert
             Assert.Equal(1, schema.Properties["NotEmpty"].MinLength);
+            Assert.False(schema.Properties["NotEmpty"].IsNullable(SchemaType.OpenApi3));
         }
 
         [Fact]
@@ -60,7 +61,10 @@ namespace ZymLabs.NSwag.FluentValidation.Tests
 
             // Assert
             Assert.Contains("NotNull", schema.RequiredProperties);
-            Assert.Equal(1, schema.Properties["NotEmpty"].MinLength);
+
+            var test = schema.Properties["NotNull"];
+            var value = test.IsNullable(SchemaType.OpenApi3);
+            Assert.False(value);
         }
 
         [Fact]

@@ -6,6 +6,7 @@ using FluentValidation.Internal;
 using FluentValidation.Validators;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using NJsonSchema;
 using NJsonSchema.Generation;
 
 namespace ZymLabs.NSwag.FluentValidation
@@ -154,6 +155,21 @@ namespace ZymLabs.NSwag.FluentValidation
                             schema.RequiredProperties.Add(context.PropertyKey);
                     }
                 },
+                new FluentValidationRule("NotNull")
+                {
+                    Matches = propertyValidator => propertyValidator is INotNullValidator,
+                    Apply = context =>
+                    {
+                        var schema = context.SchemaProcessorContext.Schema;
+
+                        schema.Properties[context.PropertyKey].IsNullableRaw = false;
+
+                        if (schema.Properties[context.PropertyKey].Type.HasFlag(JsonObjectType.Null))
+                        {
+                            schema.Properties[context.PropertyKey].Type &= ~JsonObjectType.Null; // Remove nullable
+                        }
+                    }
+                },
                 new FluentValidationRule("NotEmpty")
                 {
                     Matches = propertyValidator => propertyValidator is INotEmptyValidator,
@@ -161,6 +177,13 @@ namespace ZymLabs.NSwag.FluentValidation
                     {
                         var schema = context.SchemaProcessorContext.Schema;
 
+                        schema.Properties[context.PropertyKey].IsNullableRaw = false;
+                        
+                        if (schema.Properties[context.PropertyKey].Type.HasFlag(JsonObjectType.Null))
+                        {
+                            schema.Properties[context.PropertyKey].Type &= ~JsonObjectType.Null; // Remove nullable
+                        }
+                        
                         schema.Properties[context.PropertyKey].MinLength = 1;
                     }
                 },

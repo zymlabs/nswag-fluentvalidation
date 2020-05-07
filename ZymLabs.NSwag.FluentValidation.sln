@@ -9,6 +9,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{7C637D0D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZymLabs.NSwag.FluentValidation.Tests", "tests\ZymLabs.NSwag.FluentValidation.Tests\ZymLabs.NSwag.FluentValidation.Tests.csproj", "{792C4405-8166-47D1-9EAF-DDC5613D5400}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZymLabs.NSwag.FluentValidation.AspNetCore", "src\ZymLabs.NSwag.FluentValidation.AspNetCore\ZymLabs.NSwag.FluentValidation.AspNetCore.csproj", "{A08A952E-1B27-4782-8DFA-E1D953A373A1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZymLabs.NSwag.FluentValidation.AspNetCore.Tests", "tests\ZymLabs.NSwag.FluentValidation.AspNetCore.Tests\ZymLabs.NSwag.FluentValidation.AspNetCore.Tests.csproj", "{6C7C59F5-4BBA-413A-A7A4-15583F3833E4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,9 +27,19 @@ Global
 		{792C4405-8166-47D1-9EAF-DDC5613D5400}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{792C4405-8166-47D1-9EAF-DDC5613D5400}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{792C4405-8166-47D1-9EAF-DDC5613D5400}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A08A952E-1B27-4782-8DFA-E1D953A373A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A08A952E-1B27-4782-8DFA-E1D953A373A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A08A952E-1B27-4782-8DFA-E1D953A373A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A08A952E-1B27-4782-8DFA-E1D953A373A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C7C59F5-4BBA-413A-A7A4-15583F3833E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C7C59F5-4BBA-413A-A7A4-15583F3833E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C7C59F5-4BBA-413A-A7A4-15583F3833E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C7C59F5-4BBA-413A-A7A4-15583F3833E4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{AAB60A97-EFC3-41A9-9725-696D769B634E} = {38396F1E-AAB0-42C7-9D46-617C5DD42674}
 		{792C4405-8166-47D1-9EAF-DDC5613D5400} = {7C637D0D-E3FE-4FA6-AF2B-F70FBCECD916}
+		{A08A952E-1B27-4782-8DFA-E1D953A373A1} = {38396F1E-AAB0-42C7-9D46-617C5DD42674}
+		{6C7C59F5-4BBA-413A-A7A4-15583F3833E4} = {7C637D0D-E3FE-4FA6-AF2B-F70FBCECD916}
 	EndGlobalSection
 EndGlobal

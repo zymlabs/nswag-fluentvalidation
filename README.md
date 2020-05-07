@@ -12,7 +12,7 @@ Use FluentValidation rules instead of ComponentModel attributes to define swagge
 ### 1. Reference packages in your web project:
 
 ```console
-dotnet add package ZymLabs.NSwag.FluentValidation
+dotnet add package ZymLabs.NSwag.FluentValidation.AspNetCore
 ```
 
 ### 2. Change Startup.cs
@@ -21,6 +21,21 @@ dotnet add package ZymLabs.NSwag.FluentValidation
 // This method gets called by the runtime. Use this method to add services to the container.
 public void ConfigureServices(IServiceCollection services)
 {
+    // HttpContextServiceProviderValidatorFactory requires access to HttpContext
+    services.AddHttpContextAccessor();
+
+    services
+        .AddControllers()
+        
+        // Adds fluent validators to Asp.net
+        .AddFluentValidation(c =>
+        {
+            c.RegisterValidatorsFromAssemblyContaining<Startup>();
+
+            // Optionally set validator factory if you have problems with scope resolve inside validators.
+            c.ValidatorFactoryType = typeof(HttpContextServiceProviderValidatorFactory);
+        })
+
     services.AddOpenApiDocument((settings, serviceProvider) =>
     {
         var fluentValidationSchemaProcessor = serviceProvider.GetService<FluentValidationSchemaProcessor>();

@@ -3,7 +3,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: mcr.microsoft.com/dotnet/core/sdk:3.0
+      - image: mcr.microsoft.com/dotnet/core/sdk:3.1
 
     steps:
       - checkout
@@ -50,7 +50,7 @@ jobs:
 
   test:
     docker:
-      - image: mcr.microsoft.com/dotnet/core/sdk:3.0
+      - image: mcr.microsoft.com/dotnet/core/sdk:3.1
     
     steps:
       - checkout
@@ -92,7 +92,7 @@ jobs:
 
   deploy:
     docker:
-      - image: mcr.microsoft.com/dotnet/core/sdk:3.0
+      - image: mcr.microsoft.com/dotnet/core/sdk:3.1
     
     steps:
       - attach_workspace:

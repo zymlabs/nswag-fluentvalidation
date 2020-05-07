@@ -1,6 +1,13 @@
 # ZymLabs.NSwag.FluentValidation
 
-Use FluentValidation rules instead of ComponentModel attributes to define swagger schema.
+Use FluentValidation rules to define validation requirements for NSwag Swagger/OpenAPI schema.
+
+This project has been split into two packages.
+
+- ZymLabs.NSwag.FluentValidation
+  - Provides the core logic, can be included in an application project.
+- ZymLabs.NSwag.FluentValidation.AspNetCore
+  - Provides the AspNetCore HTTP helpers such as the `HttpContextServiceProviderValidatorFactory` for supporting HttpContext scoped services when using FluentValidation with DB Context validators.
 
 ## Statuses
 
@@ -12,6 +19,12 @@ Use FluentValidation rules instead of ComponentModel attributes to define swagge
 ### 1. Reference packages in your web project:
 
 ```console
+dotnet add package ZymLabs.NSwag.FluentValidation.AspNetCore
+```
+
+Use the core package for your application project as it doesn't include AspNetCore MVC dependencies.
+
+```console
 dotnet add package ZymLabs.NSwag.FluentValidation
 ```
 
@@ -21,7 +34,22 @@ dotnet add package ZymLabs.NSwag.FluentValidation
 // This method gets called by the runtime. Use this method to add services to the container.
 public void ConfigureServices(IServiceCollection services)
 {
-    services.AddOpenApiDocument((settings, serviceProvider)) =>
+    // HttpContextServiceProviderValidatorFactory requires access to HttpContext
+    services.AddHttpContextAccessor();
+
+    services
+        .AddControllers()
+
+        // Adds fluent validators to Asp.net
+        .AddFluentValidation(c =>
+        {
+            c.RegisterValidatorsFromAssemblyContaining<Startup>();
+
+            // Optionally set validator factory if you have problems with scope resolve inside validators.
+            c.ValidatorFactoryType = typeof(HttpContextServiceProviderValidatorFactory);
+        })
+
+    services.AddOpenApiDocument((settings, serviceProvider) =>
     {
         var fluentValidationSchemaProcessor = serviceProvider.GetService<FluentValidationSchemaProcessor>();
 

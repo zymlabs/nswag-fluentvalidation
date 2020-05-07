@@ -2,7 +2,7 @@
 
     <PropertyGroup>
       <TargetFramework>netstandard2.0</TargetFramework>
-      <Description>Use FluentValidation rules instead of ComponentModel attributes to define swagger schema.</Description>
+      <Description>Use FluentValidation rules to define validation requirements for NSwag Swagger/OpenAPI schema.</Description>
       <Copyright>Copyright (c) 2019 Zym Labs LLC</Copyright>
       <PackageLicenseUrl>https://raw.githubusercontent.com/zymlabs/nswag-fluentvalidation/master/LICENSE</PackageLicenseUrl>
       <RepositoryUrl>https://github.com/zymlabs/nswag-fluentvalidation.git</RepositoryUrl>

@@ -119,14 +119,14 @@ namespace ZymLabs.NSwag.FluentValidation
             // Note: IValidatorDescriptor doesn't return IncludeRules so we need to get validators manually.
             var childAdapters = (validator as IEnumerable<IValidationRule>)
                 .NotNull()
-                .OfType<IncludeRule>()
+                .OfType<IncludeRule<object>>()
                 .Where(includeRule => includeRule.Condition == null && includeRule.AsyncCondition == null)
                 .SelectMany(includeRule => includeRule.Validators)
-                .OfType<ChildValidatorAdaptor>();
+                .OfType<ChildValidatorAdaptor<object, object>>();
 
             foreach (var adapter in childAdapters)
             {
-                var propertyValidatorContext = new PropertyValidatorContext(new ValidationContext(null), null, string.Empty);
+                var propertyValidatorContext = new PropertyValidatorContext(new ValidationContext<object>(null), null, string.Empty);
                 var includeValidator = adapter.GetValidator(propertyValidatorContext);
                 ApplyRulesToSchema(context, includeValidator);
                 AddRulesFromIncludedValidators(context, includeValidator);

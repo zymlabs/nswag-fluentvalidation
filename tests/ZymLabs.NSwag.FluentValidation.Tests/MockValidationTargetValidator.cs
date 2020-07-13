@@ -1,4 +1,5 @@
 using FluentValidation;
+using FluentValidation.Validators;
 
 namespace ZymLabs.NSwag.FluentValidation.Tests
 {
@@ -11,6 +12,8 @@ namespace ZymLabs.NSwag.FluentValidation.Tests
             RuleFor(sample => sample.NotNull).NotNull();
             RuleFor(sample => sample.NotEmpty).NotEmpty();
             RuleFor(sample => sample.EmailAddress).EmailAddress();
+            RuleFor(sample => sample.EmailAddressNet4).EmailAddress(EmailValidationMode.Net4xRegex);
+
             RuleFor(sample => sample.RegexField).Matches(@"(\d{4})-(\d{2})-(\d{2})");
 
             RuleFor(sample => sample.ValueInRange).GreaterThanOrEqualTo(5).LessThanOrEqualTo(10);

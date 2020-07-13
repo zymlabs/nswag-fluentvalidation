@@ -35,6 +35,19 @@ namespace ZymLabs.NSwag.FluentValidation.Tests
             // Assert
             Assert.NotEmpty(schema.Properties["EmailAddress"].Pattern);
         }
+        
+        [Fact]
+        public void ProcessIncludesDefaultRuleEmailAddressNet4()
+        {
+            // Arrange
+            var jsonSchemaGeneratorSettings = CreateJsonSchemaGeneratorSettings();
+
+            // Act
+            var schema = JsonSchema.FromType<MockValidationTarget>(jsonSchemaGeneratorSettings);
+
+            // Assert
+            Assert.NotEmpty(schema.Properties["EmailAddress"].Pattern);
+        }
 
         [Fact]
         public void ProcessIncludesDefaultRuleNotEmpty()

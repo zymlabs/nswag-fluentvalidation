@@ -117,19 +117,43 @@ namespace ZymLabs.NSwag.FluentValidation
         private void AddRulesFromIncludedValidators(SchemaProcessorContext context, IValidator validator)
         {
             // Note: IValidatorDescriptor doesn't return IncludeRules so we need to get validators manually.
-            var childAdapters = (validator as IEnumerable<IValidationRule>)
+            var includeRules = (validator as IEnumerable<IValidationRule>)
                 .NotNull()
-                .OfType<IncludeRule<object>>()
-                .Where(includeRule => includeRule.Condition == null && includeRule.AsyncCondition == null)
+                .OfType<PropertyRule>()
+                .Where(includeRule =>
+                    includeRule.Condition == null && includeRule.AsyncCondition == null
+                                                  && includeRule.GetType().IsGenericType 
+                                                  && includeRule.GetType().GetGenericTypeDefinition() == typeof(IncludeRule<>)
+                )
+                .ToList();
+            
+            var childAdapters = includeRules  
+                // 2nd filter 
                 .SelectMany(includeRule => includeRule.Validators)
-                .OfType<ChildValidatorAdaptor<object, object>>();
+                .Where(x => x.GetType().IsGenericType 
+                    && x.GetType().GetGenericTypeDefinition() == typeof(ChildValidatorAdaptor<,>))
+                .ToList();
 
             foreach (var adapter in childAdapters)
             {
                 var propertyValidatorContext = new PropertyValidatorContext(new ValidationContext<object>(null), null, string.Empty);
-                var includeValidator = adapter.GetValidator(propertyValidatorContext);
-                ApplyRulesToSchema(context, includeValidator);
-                AddRulesFromIncludedValidators(context, includeValidator);
+                if (adapter.GetType().GetGenericTypeDefinition() == typeof(ChildValidatorAdaptor<,>))
+                {
+                    var adapterType = adapter.GetType();
+
+                    var adapterMethod = adapterType
+                        .GetMethod("GetValidator");
+
+                    if (adapterMethod != null)
+                    {
+                        IValidator includeValidator = adapterMethod
+                            .Invoke(adapter, new object[] { propertyValidatorContext }) as IValidator;
+
+                        ApplyRulesToSchema(context, includeValidator);
+                        AddRulesFromIncludedValidators(context, includeValidator);
+                    }
+
+                }
             }
         }
         
@@ -281,6 +305,15 @@ namespace ZymLabs.NSwag.FluentValidation
                                 schemaProperty.Maximum = Convert.ToDecimal(betweenValidator.To);
                             }
                         }
+                    }
+                },
+                new FluentValidationRule("AspNetCoreCompatibleEmail")
+                {
+                    Matches = propertyValidator => propertyValidator is AspNetCoreCompatibleEmailValidator,
+                    Apply = context =>
+                    {
+                        var schema = context.SchemaProcessorContext.Schema;
+                        schema.Properties[context.PropertyKey].Pattern = "^[^@]+@[^@]+$"; // [^@] All chars except @
                     }
                 },
             };

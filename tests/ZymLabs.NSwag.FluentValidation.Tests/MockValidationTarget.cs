@@ -8,6 +8,8 @@ namespace ZymLabs.NSwag.FluentValidation.Tests
         public string NotNull { get; set; }
         public string NotEmpty { get; set; }
         public string EmailAddress { get; set; }
+        public string EmailAddressNet4 { get; set; }
+
         public string RegexField { get; set; }
 
         public int ValueInRange { get; set; }

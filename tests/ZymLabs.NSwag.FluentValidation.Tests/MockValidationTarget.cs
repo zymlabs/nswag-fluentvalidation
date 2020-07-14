@@ -22,10 +22,9 @@ namespace ZymLabs.NSwag.FluentValidation.Tests
 
         public MockValidationTargetChild NotNullChild { get; set; }
         public MockValidationTargetChild NotEmptyChild { get; set; }
-    }
+        
+        public MockValidationTargetChildEnum NotNullChildEnum { get; set; }
+        public MockValidationTargetChildEnum NotEmptyChildEnum { get; set; }
 
-    public class MockValidationTargetChild
-    {
-        public string ChildProperty { get; set; }
     }
 }

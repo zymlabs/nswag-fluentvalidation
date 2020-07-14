@@ -65,6 +65,11 @@ namespace ZymLabs.NSwag.FluentValidation.Tests
             var notEmptyChildProperty = schema.Properties["NotEmptyChild"];
             Assert.Empty(notEmptyChildProperty.OneOf);
             Assert.NotNull(notEmptyChildProperty.Reference);
+            
+            // Unable to get this to work right now
+            // var notEmptyChildPropertyEnum = schema.Properties["NotEmptyChildEnum"];
+            // Assert.Empty(notEmptyChildPropertyEnum.OneOf);
+            // Assert.NotNull(notEmptyChildPropertyEnum.Reference);
         }
 
         [Fact]
@@ -86,6 +91,11 @@ namespace ZymLabs.NSwag.FluentValidation.Tests
             var notNullChildProperty = schema.Properties["NotNullChild"];
             Assert.Empty(notNullChildProperty.OneOf);
             Assert.NotNull(notNullChildProperty.Reference);
+            
+            // Unable to get this to work right now
+            // var notNullChildPropertyEnum = schema.Properties["NotNullChildEnum"];
+            // Assert.Empty(notNullChildPropertyEnum.OneOf);
+            // Assert.NotNull(notNullChildPropertyEnum.Reference);
         }
 
         [Fact]

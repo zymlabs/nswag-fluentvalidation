@@ -25,6 +25,9 @@ namespace ZymLabs.NSwag.FluentValidation.Tests
             RuleFor(sample => sample.NotNullChild).NotNull();
             RuleFor(sample => sample.NotEmptyChild).NotEmpty();
 
+            RuleFor(sample => sample.NotNullChildEnum).NotNull();
+            RuleFor(sample => sample.NotEmptyChildEnum).NotEmpty();
+            
             Include(new MockValidationTargetIncludeValidator());
         }
     }

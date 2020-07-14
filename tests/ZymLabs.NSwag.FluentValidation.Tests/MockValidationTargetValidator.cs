@@ -22,6 +22,9 @@ namespace ZymLabs.NSwag.FluentValidation.Tests
             RuleFor(sample => sample.ValueInRangeFloat).InclusiveBetween(1.1f, 5.3f);
             RuleFor(sample => sample.ValueInRangeDouble).ExclusiveBetween(2.2, 7.5f);
 
+            RuleFor(sample => sample.NotNullChild).NotNull();
+            RuleFor(sample => sample.NotEmptyChild).NotEmpty();
+
             Include(new MockValidationTargetIncludeValidator());
         }
     }

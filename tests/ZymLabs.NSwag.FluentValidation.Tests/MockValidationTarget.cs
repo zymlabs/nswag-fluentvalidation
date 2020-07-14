@@ -19,5 +19,13 @@ namespace ZymLabs.NSwag.FluentValidation.Tests
         public double ValueInRangeDouble { get; set; }
 
         public string IncludeField { get; set; }
+
+        public MockValidationTargetChild NotNullChild { get; set; }
+        public MockValidationTargetChild NotEmptyChild { get; set; }
+    }
+
+    public class MockValidationTargetChild
+    {
+        public string ChildProperty { get; set; }
     }
 }

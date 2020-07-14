@@ -192,6 +192,14 @@ namespace ZymLabs.NSwag.FluentValidation
                         {
                             schema.Properties[context.PropertyKey].Type &= ~JsonObjectType.Null; // Remove nullable
                         }
+
+                        var oneOfsWithReference = schema.Properties[context.PropertyKey].OneOf.Where(x => x.Reference != null).ToList();
+                        if (oneOfsWithReference.Count == 1)
+                        {
+                            // Set the Reference directly instead and clear the OneOf collection
+                            schema.Properties[context.PropertyKey].Reference = oneOfsWithReference.Single();
+                            schema.Properties[context.PropertyKey].OneOf.Clear();
+                        }
                     }
                 },
                 new FluentValidationRule("NotEmpty")
@@ -207,7 +215,15 @@ namespace ZymLabs.NSwag.FluentValidation
                         {
                             schema.Properties[context.PropertyKey].Type &= ~JsonObjectType.Null; // Remove nullable
                         }
-                        
+
+                        var oneOfsWithReference = schema.Properties[context.PropertyKey].OneOf.Where(x => x.Reference != null).ToList();
+                        if (oneOfsWithReference.Count == 1)
+                        {
+                            // Set the Reference directly instead and clear the OneOf collection
+                            schema.Properties[context.PropertyKey].Reference = oneOfsWithReference.Single();
+                            schema.Properties[context.PropertyKey].OneOf.Clear();
+                        }
+
                         schema.Properties[context.PropertyKey].MinLength = 1;
                     }
                 },

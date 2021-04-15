@@ -1,0 +1,199 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
+  workflow_dispatch: ~
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # Required for gitversion to detect versionin history. See https://github.com/GitTools/actions/blob/master/docs/examples/github/gitversion/index.md
+          
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+          source-url: https://nuget.pkg.github.com/zymlabs/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.5 
+        with:
+          versionSpec: '5.6.x'
+
+      - name: Run GitVersion
+        id: gitversion # Step id used as reference for output values
+        uses: gittools/actions/gitversion/execute@v0.9.5 # Stores to GITVERSION_* environment variables
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v2
+        with:
+          path: | 
+            ~/.nuget/packages
+            !~/.nuget/packages/unwanted
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+            
+      - name: Install dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Debug --no-restore
+
+      - name: Run tests
+        run: dotnet test --no-restore --no-build --verbosity normal --logger "trx" --logger "console;noprogress=true"
+      
+      - name: Convert test results to JUnit format
+        if: ${{ always() }}
+        run: |
+          dotnet tool install -g trx2junit
+          export PATH="$PATH:/root/.dotnet/tools"
+          trx2junit tests/**/TestResults/*.trx --output tests/TestResults/JUnit
+        
+      - name: Upload test results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: Test Results
+          path: tests/TestResults
+          if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn` 
+
+  doc:
+    needs: [test]
+    runs-on: ubuntu-20.04
+      
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # Required for gitversion to detect versionin history. See https://github.com/GitTools/actions/blob/master/docs/examples/github/gitversion/index.md
+          
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+          source-url: https://nuget.pkg.github.com/zymlabs/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.5 
+        with:
+          versionSpec: '5.6.x'
+
+      - name: Run GitVersion
+        id: gitversion # Step id used as reference for output values
+        uses: gittools/actions/gitversion/execute@v0.9.5 # Stores to GITVERSION_* environment variables
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v2
+        with:
+          path: | 
+            ~/.nuget/packages
+            !~/.nuget/packages/unwanted
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+            
+      - name: Install dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+        
+      - uses: nikeee/docfx-action@v1.0.0
+        name: Build Documentation
+        with:
+          args: docfx.json
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: DocFX
+          path: _site
+          if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn` 
+    
+  release:
+    needs: [test, doc]
+    if: contains('
+        refs/heads/master
+        refs/heads/develop
+      ', github.ref)
+    runs-on: ubuntu-20.04
+    
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # Required for gitversion to detect version history. See https://github.com/GitTools/actions/blob/master/docs/examples/github/gitversion/index.md
+          
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+          source-url: https://nuget.pkg.github.com/zymlabs/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.5
+        with:
+          versionSpec: '5.6.x'
+
+      - name: Run GitVersion
+        id: gitversion # Step id used as reference for output values
+        uses: gittools/actions/gitversion/execute@v0.9.5 # Stores to GITVERSION_* environment variables
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v2
+        with:
+          path: | 
+            ~/.nuget/packages
+            !~/.nuget/packages/unwanted
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+            
+      - name: Install dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+      
+      - name: Pack NuGet Packages
+        run: dotnet pack -c Release /p:Version=$GITVERSION_NUGETVERSION -o bin/ --no-restore --no-build
+              
+      - name: Publish NuGet Private Packages 
+        run: dotnet nuget push bin/ \
+          --api-key ${{ secrets.GITHUB_TOKEN }} \
+          --source https://nuget.pkg.github.com/${{ github.repository_owner }}
+
+      - name: Publish NuGet Public Packages
+        run: dotnet nuget push bin/ \
+          --api-key ${{ secrets.NUGET_PUBLIC_API_KEY }} \
+          --source ${{ secrets.NUGET_PUBLIC_FEED }}
+
+      - name: Store NuGet package artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Nuget Packages
+          path: bin/
+          if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn` 

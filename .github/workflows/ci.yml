@@ -187,9 +187,7 @@ jobs:
       #     --source https://nuget.pkg.github.com/${{ github.repository_owner }}
 
       - name: Publish NuGet Public Packages
-        run: dotnet nuget push bin/ \
-          --api-key ${{ secrets.NUGET_PUBLIC_API_KEY }} \
-          --source ${{ secrets.NUGET_PUBLIC_FEED }}
+        run: dotnet nuget push bin/ --api-key ${{ secrets.NUGET_PUBLIC_API_KEY }} --source ${{ secrets.NUGET_PUBLIC_FEED }}
 
       - name: Store NuGet package artifacts
         uses: actions/upload-artifact@v2

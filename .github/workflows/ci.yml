@@ -181,10 +181,8 @@ jobs:
       - name: Pack NuGet Packages
         run: dotnet pack -c Release /p:Version=$GITVERSION_NUGETVERSION -o bin/ --no-restore --no-build
               
-      # - name: Publish NuGet Private Packages 
-      #   run: dotnet nuget push bin/ \
-      #     --api-key ${{ secrets.GITHUB_TOKEN }} \
-      #     --source https://nuget.pkg.github.com/${{ github.repository_owner }}
+      - name: Publish NuGet Private Packages 
+        run: dotnet nuget push bin/ --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/${{ github.repository_owner }}
 
       - name: Publish NuGet Public Packages
         run: dotnet nuget push bin/ --api-key ${{ secrets.NUGET_PUBLIC_API_KEY }} --source ${{ secrets.NUGET_PUBLIC_FEED }}

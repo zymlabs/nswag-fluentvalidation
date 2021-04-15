@@ -19,30 +19,35 @@ namespace ZymLabs.NSwag.FluentValidation
         private readonly IValidatorFactory _validatorFactory;
         private readonly ILogger _logger;
         private readonly IReadOnlyList<FluentValidationRule> _rules;
-        
+
         /// <summary>
         /// Creates new instance of <see cref="FluentValidationSchemaProcessor"/>
         /// </summary>
         /// <param name="validatorFactory">Validator factory.</param>
         /// <param name="rules">External FluentValidation rules. Rule with the same name replaces default rule.</param>
         /// <param name="loggerFactory"><see cref="ILoggerFactory"/> for logging. Can be null.</param>
-        public FluentValidationSchemaProcessor(IValidatorFactory validatorFactory, IEnumerable<FluentValidationRule> rules = null, ILoggerFactory loggerFactory = null)
+        public FluentValidationSchemaProcessor(IValidatorFactory validatorFactory,
+                                               IEnumerable<FluentValidationRule>? rules = null,
+                                               ILoggerFactory? loggerFactory = null)
         {
             _validatorFactory = validatorFactory;
             _logger = loggerFactory?.CreateLogger(typeof(FluentValidationSchemaProcessor)) ?? NullLogger.Instance;
             _rules = CreateDefaultRules();
+
             if (rules != null)
             {
                 var ruleMap = _rules.ToDictionary(rule => rule.Name, rule => rule);
+
                 foreach (var rule in rules)
                 {
                     // Add or replace rule
                     ruleMap[rule.Name] = rule;
                 }
+
                 _rules = ruleMap.Values.ToList();
             }
         }
-        
+
         /// <inheritdoc />
         public void Process(SchemaProcessorContext context)
         {
@@ -53,24 +58,25 @@ namespace ZymLabs.NSwag.FluentValidation
                 return;
             }
 
-            IValidator validator = null;
+            IValidator? validator = null;
 
             try
-            {       
+            {
                 validator = _validatorFactory.GetValidator(context.Type);
             }
             catch (Exception e)
             {
-                _logger.LogWarning(0, e, $"GetValidator for type '{context.Type}' fails.");
+                _logger.LogWarning(0, e, $"GetValidator for type '{context.Type}' fails");
             }
-            
+
+            // Check if a validator exists for this property
             if (validator == null)
             {
                 return;
             }
-                
-            _logger.LogDebug($"Applying FluentValidation rules to swagger schema for type '{context.Type}'.");
-            
+
+            _logger.LogDebug($"Applying FluentValidation rules to swagger schema for type '{context.Type}'");
+
             ApplyRulesToSchema(context, validator);
 
             try
@@ -79,15 +85,17 @@ namespace ZymLabs.NSwag.FluentValidation
             }
             catch (Exception e)
             {
-                _logger.LogWarning(0, e, $"Applying IncludeRules for type '{context.Type}' fails.");
+                _logger.LogWarning(0, e, $"Applying IncludeRules for type '{context.Type}' fails");
             }
         }
-        
+
         private void ApplyRulesToSchema(SchemaProcessorContext context, IValidator validator)
         {
-             _logger.LogDebug($"Applying FluentValidation rules to swagger schema for type '{context.Type}'.");
+            _logger.LogDebug($"Applying FluentValidation rules to swagger schema for type '{context.Type}'");
 
             var schema = context.Schema;
+
+            // Loop through properties
             foreach (var key in schema?.Properties?.Keys ?? Array.Empty<string>())
             {
                 var validators = validator.GetValidatorsForMemberIgnoreCase(key);
@@ -101,42 +109,48 @@ namespace ZymLabs.NSwag.FluentValidation
                             try
                             {
                                 rule.Apply(new RuleContext(context, key, propertyValidator));
-                                
-                                _logger.LogDebug($"Rule '{rule.Name}' applied for property '{context.Type.Name}.{key}'");
+
+                                _logger.LogDebug(
+                                    $"Rule '{rule.Name}' applied for property '{context.Type.Name}.{key}'"
+                                );
                             }
                             catch (Exception e)
                             {
-                                _logger.LogWarning(0, e, $"Error on apply rule '{rule.Name}' for property '{context.Type.Name}.{key}'.");
+                                _logger.LogWarning(
+                                    0, e, $"Error on apply rule '{rule.Name}' for property '{context.Type.Name}.{key}'"
+                                );
                             }
                         }
                     }
                 }
             }
         }
-        
+
         private void AddRulesFromIncludedValidators(SchemaProcessorContext context, IValidator validator)
         {
             // Note: IValidatorDescriptor doesn't return IncludeRules so we need to get validators manually.
             var includeRules = (validator as IEnumerable<IValidationRule>)
-                .NotNull()
-                .OfType<PropertyRule>()
-                .Where(includeRule =>
-                    includeRule.Condition == null && includeRule.AsyncCondition == null
-                                                  && includeRule.GetType().IsGenericType 
-                                                  && includeRule.GetType().GetGenericTypeDefinition() == typeof(IncludeRule<>)
-                )
-                .ToList();
-            
-            var childAdapters = includeRules  
-                // 2nd filter 
-                .SelectMany(includeRule => includeRule.Validators)
-                .Where(x => x.GetType().IsGenericType 
-                    && x.GetType().GetGenericTypeDefinition() == typeof(ChildValidatorAdaptor<,>))
-                .ToList();
+                               .NotNull()
+                               .Where(
+                                   includeRule =>
+                                       !includeRule.HasCondition && !includeRule.HasAsyncCondition
+                                                                 && includeRule is IIncludeRule
+                               )
+                               .ToList();
+
+            var childAdapters = includeRules
+                                // 2nd filter 
+                                .SelectMany(
+                                    includeRule => { return includeRule.Components.Select(c => c.Validator); }
+                                )
+                                .Where(
+                                    x => x.GetType().IsGenericType
+                                         && x.GetType().GetGenericTypeDefinition() == typeof(ChildValidatorAdaptor<,>)
+                                )
+                                .ToList();
 
             foreach (var adapter in childAdapters)
             {
-                var propertyValidatorContext = new PropertyValidatorContext(new ValidationContext<object>(null), null, string.Empty);
                 if (adapter.GetType().GetGenericTypeDefinition() == typeof(ChildValidatorAdaptor<,>))
                 {
                     var adapterType = adapter.GetType();
@@ -146,17 +160,27 @@ namespace ZymLabs.NSwag.FluentValidation
 
                     if (adapterMethod != null)
                     {
-                        IValidator includeValidator = adapterMethod
-                            .Invoke(adapter, new object[] { propertyValidatorContext }) as IValidator;
+                        // Create validation context of generic type
+                        var validationContext = Activator.CreateInstance(
+                            adapterMethod.GetParameters().First().ParameterType, new object[] { null }
+                        );
+                        //var validationContext = new ValidationContext<object>(null);
+
+                        var includeValidator = adapterMethod
+                            .Invoke(adapter, new object[] { validationContext, null }) as IValidator;
+
+                        if (includeValidator == null)
+                        {
+                            break;
+                        }
 
                         ApplyRulesToSchema(context, includeValidator);
                         AddRulesFromIncludedValidators(context, includeValidator);
                     }
-
                 }
             }
         }
-        
+
         /// <summary>
         /// Creates default rules.
         /// Can be overriden by name.
@@ -167,14 +191,15 @@ namespace ZymLabs.NSwag.FluentValidation
             {
                 new FluentValidationRule("Required")
                 {
-                    Matches = propertyValidator => propertyValidator is INotNullValidator || propertyValidator is INotEmptyValidator,
+                    Matches = propertyValidator =>
+                        propertyValidator is INotNullValidator || propertyValidator is INotEmptyValidator,
                     Apply = context =>
                     {
                         var schema = context.SchemaProcessorContext.Schema;
-                        
+
                         if (schema == null)
                             return;
-                        
+
                         if (!schema.RequiredProperties.Contains(context.PropertyKey))
                             schema.RequiredProperties.Add(context.PropertyKey);
                     }
@@ -193,7 +218,9 @@ namespace ZymLabs.NSwag.FluentValidation
                             schema.Properties[context.PropertyKey].Type &= ~JsonObjectType.Null; // Remove nullable
                         }
 
-                        var oneOfsWithReference = schema.Properties[context.PropertyKey].OneOf.Where(x => x.Reference != null).ToList();
+                        var oneOfsWithReference = schema.Properties[context.PropertyKey].OneOf
+                                                        .Where(x => x.Reference != null).ToList();
+
                         if (oneOfsWithReference.Count == 1)
                         {
                             // Set the Reference directly instead and clear the OneOf collection
@@ -210,13 +237,15 @@ namespace ZymLabs.NSwag.FluentValidation
                         var schema = context.SchemaProcessorContext.Schema;
 
                         schema.Properties[context.PropertyKey].IsNullableRaw = false;
-                        
+
                         if (schema.Properties[context.PropertyKey].Type.HasFlag(JsonObjectType.Null))
                         {
                             schema.Properties[context.PropertyKey].Type &= ~JsonObjectType.Null; // Remove nullable
                         }
 
-                        var oneOfsWithReference = schema.Properties[context.PropertyKey].OneOf.Where(x => x.Reference != null).ToList();
+                        var oneOfsWithReference = schema.Properties[context.PropertyKey].OneOf
+                                                        .Where(x => x.Reference != null).ToList();
+
                         if (oneOfsWithReference.Count == 1)
                         {
                             // Set the Reference directly instead and clear the OneOf collection
@@ -234,13 +263,13 @@ namespace ZymLabs.NSwag.FluentValidation
                     {
                         var schema = context.SchemaProcessorContext.Schema;
 
-                        var lengthValidator = (ILengthValidator)context.PropertyValidator;
+                        var lengthValidator = (ILengthValidator) context.PropertyValidator;
 
-                        if(lengthValidator.Max > 0)
+                        if (lengthValidator.Max > 0)
                             schema.Properties[context.PropertyKey].MaxLength = lengthValidator.Max;
 
-                        if (lengthValidator is MinimumLengthValidator
-                            || lengthValidator is ExactLengthValidator
+                        if (lengthValidator.GetType() == typeof(MinimumLengthValidator<>)
+                            || lengthValidator.GetType() == typeof(ExactLengthValidator<>)
                             || schema.Properties[context.PropertyKey].MinLength == null)
                             schema.Properties[context.PropertyKey].MinLength = lengthValidator.Min;
                     }
@@ -250,8 +279,8 @@ namespace ZymLabs.NSwag.FluentValidation
                     Matches = propertyValidator => propertyValidator is IRegularExpressionValidator,
                     Apply = context =>
                     {
-                        var regularExpressionValidator = (IRegularExpressionValidator)context.PropertyValidator;
-                        
+                        var regularExpressionValidator = (IRegularExpressionValidator) context.PropertyValidator;
+
                         var schema = context.SchemaProcessorContext.Schema;
                         schema.Properties[context.PropertyKey].Pattern = regularExpressionValidator.Expression;
                     }
@@ -261,7 +290,8 @@ namespace ZymLabs.NSwag.FluentValidation
                     Matches = propertyValidator => propertyValidator is IComparisonValidator,
                     Apply = context =>
                     {
-                        var comparisonValidator = (IComparisonValidator)context.PropertyValidator;
+                        var comparisonValidator = (IComparisonValidator) context.PropertyValidator;
+
                         if (comparisonValidator.ValueToCompare.IsNumeric())
                         {
                             var valueToCompare = Convert.ToDecimal(comparisonValidator.ValueToCompare);
@@ -294,13 +324,13 @@ namespace ZymLabs.NSwag.FluentValidation
                     Matches = propertyValidator => propertyValidator is IBetweenValidator,
                     Apply = context =>
                     {
-                        var betweenValidator = (IBetweenValidator)context.PropertyValidator;
+                        var betweenValidator = (IBetweenValidator) context.PropertyValidator;
                         var schema = context.SchemaProcessorContext.Schema;
                         var schemaProperty = schema.Properties[context.PropertyKey];
 
                         if (betweenValidator.From.IsNumeric())
                         {
-                            if (betweenValidator is ExclusiveBetweenValidator)
+                            if (betweenValidator.GetType().IsSubClassOfGeneric(typeof(ExclusiveBetweenValidator<,>)))
                             {
                                 schemaProperty.ExclusiveMinimum = Convert.ToDecimal(betweenValidator.From);
                             }
@@ -312,7 +342,7 @@ namespace ZymLabs.NSwag.FluentValidation
 
                         if (betweenValidator.To.IsNumeric())
                         {
-                            if (betweenValidator is ExclusiveBetweenValidator)
+                            if (betweenValidator.GetType().IsSubClassOfGeneric(typeof(ExclusiveBetweenValidator<,>)))
                             {
                                 schemaProperty.ExclusiveMaximum = Convert.ToDecimal(betweenValidator.To);
                             }
@@ -325,7 +355,10 @@ namespace ZymLabs.NSwag.FluentValidation
                 },
                 new FluentValidationRule("AspNetCoreCompatibleEmail")
                 {
-                    Matches = propertyValidator => propertyValidator is AspNetCoreCompatibleEmailValidator,
+                    Matches = propertyValidator => propertyValidator.GetType()
+                                                                    .IsSubClassOfGeneric(
+                                                                        typeof(AspNetCoreCompatibleEmailValidator<>)
+                                                                    ),
                     Apply = context =>
                     {
                         var schema = context.SchemaProcessorContext.Schema;

@@ -8,6 +8,8 @@
     <RepositoryUrl>https://github.com/zymlabs/nswag-fluentvalidation.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>nswag; fluentvalidation; swagger</PackageTags>
+    <LangVersion>9</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -20,9 +22,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.5" />
-    <PackageReference Include="NJsonSchema" Version="10.1.23" />
+    <PackageReference Include="FluentValidation" Version="10.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
+    <PackageReference Include="NJsonSchema" Version="10.4.1" />
   </ItemGroup>
 
 </Project>

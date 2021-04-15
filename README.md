@@ -51,16 +51,23 @@ public void ConfigureServices(IServiceCollection services)
 
     services.AddOpenApiDocument((settings, serviceProvider) =>
     {
-        var fluentValidationSchemaProcessor = serviceProvider.GetService<FluentValidationSchemaProcessor>();
+        var fluentValidationSchemaProcessor = serviceProvider.CreateScope().ServiceProvider.GetService<FluentValidationSchemaProcessor>();
 
         // Add the fluent validations schema processor
         settings.SchemaProcessors.Add(fluentValidationSchemaProcessor);
     });
 
-    // Add the FluentValidationSchemaProcessor as a singleton
-    services.AddSingleton<FluentValidationSchemaProcessor>();
+    // Add the FluentValidationSchemaProcessor as a scoped service
+    serviceCollection.AddScoped<FluentValidationSchemaProcessor>();
 }
 ```
+
+## Version compatibility
+
+ZymLabs.NSwag.FluentValidation | Swashbuckle.AspNetCore | FluentValidation
+---------|----------|---------
+[0.1.0, 0.4.0) | [13.0.0, 14.0.0) | >=7.2.0
+[0.4.0, 0.5.0) | [13.0.0, 14.0.0) | >=10.0.0
 
 ## Supported validators
 

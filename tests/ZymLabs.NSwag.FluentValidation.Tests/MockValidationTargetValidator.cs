@@ -12,7 +12,9 @@ namespace ZymLabs.NSwag.FluentValidation.Tests
             RuleFor(sample => sample.NotNull).NotNull();
             RuleFor(sample => sample.NotEmpty).NotEmpty();
             RuleFor(sample => sample.EmailAddress).EmailAddress();
+#pragma warning disable 618
             RuleFor(sample => sample.EmailAddressNet4).EmailAddress(EmailValidationMode.Net4xRegex);
+#pragma warning restore 618
 
             RuleFor(sample => sample.RegexField).Matches(@"(\d{4})-(\d{2})-(\d{2})");
 

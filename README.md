@@ -12,7 +12,7 @@ This project has been split into two packages.
 ## Statuses
 
 [![License](https://img.shields.io/github/license/zymlabs/nswag-fluentvalidation.svg)](https://raw.githubusercontent.com/zymlabs/nswag-fluentvalidation/master/LICENSE)
-[![CircleCI](https://circleci.com/gh/zymlabs/nswag-fluentvalidation.svg?style=svg)](https://circleci.com/gh/zymlabs/nswag-fluentvalidation)
+[![CI/CD](https://github.com/zymlabs/nswag-fluentvalidation/actions/workflows/ci.yml/badge.svg)](https://github.com/zymlabs/nswag-fluentvalidation/actions/workflows/ci.yml)
 
 ## Usage
 
@@ -22,7 +22,7 @@ This project has been split into two packages.
 dotnet add package ZymLabs.NSwag.FluentValidation.AspNetCore
 ```
 
-Use the core package for your application project as it doesn't include AspNetCore MVC dependencies.
+Or if you want to use the core package for your application without the AspNetCore MVC dependencies.
 
 ```console
 dotnet add package ZymLabs.NSwag.FluentValidation

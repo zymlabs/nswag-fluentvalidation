@@ -16,12 +16,12 @@ namespace ZymLabs.NSwag.FluentValidation
         /// <summary>
         /// Predicate to match property validator.
         /// </summary>
-        public Func<IPropertyValidator, bool> Matches { get; set; }
+        public Func<IPropertyValidator, bool> Matches { get; set; } = _ => false;
 
         /// <summary>
         /// Modify Swagger schema action.
         /// </summary>
-        public Action<RuleContext> Apply { get; set; }
+        public Action<RuleContext> Apply { get; set; } = _ => { };
 
         /// <summary>
         /// Creates new instance of <see cref="FluentValidationRule"/>.

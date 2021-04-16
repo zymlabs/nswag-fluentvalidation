@@ -58,7 +58,7 @@ namespace ZymLabs.NSwag.FluentValidation.AspNetCore.Tests
             var validator = validationFactory.CreateInstance(validatorType);
 
             // Assert
-            Assert.IsType<TestValidator>(httpContextAccessor.Object.HttpContext.RequestServices.GetService(validatorType));
+            Assert.IsType<TestValidator>(httpContextAccessor.Object.HttpContext?.RequestServices.GetService(validatorType));
             Assert.IsType<TestValidator>(validator);
         }
         
@@ -66,7 +66,7 @@ namespace ZymLabs.NSwag.FluentValidation.AspNetCore.Tests
         public void CreateInstanceReturnsValidatorThrowsExceptionWhenNull()
         {
             // Arrange
-            IValidator mockValidator = null;
+            IValidator? mockValidator = null;
             var validatorType = typeof(TestValidator);
 
             // Mock ServiceProvider

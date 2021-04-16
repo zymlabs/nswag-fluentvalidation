@@ -13,7 +13,7 @@ namespace ZymLabs.NSwag.FluentValidation
     internal static class ValidationExtensions
     {
         /// <summary>
-        /// Contains <see cref="PropertyRule"/> and additional info.
+        /// Contains <see cref="IValidationRule"/> and additional info.
         /// </summary>
         public readonly struct ValidationRuleContext
         {
@@ -23,7 +23,7 @@ namespace ZymLabs.NSwag.FluentValidation
             public readonly IValidationRule ValidationRule;
 
             /// <summary>
-            /// Flag indication whether the <see cref="PropertyRule"/> is the CollectionRule.
+            /// Flag indication whether the <see cref="IValidationRule"/> is the CollectionRule.
             /// </summary>
             public readonly bool IsCollectionRule;
 
@@ -47,7 +47,7 @@ namespace ZymLabs.NSwag.FluentValidation
         /// <summary>
         /// Returns not null enumeration.
         /// </summary>
-        public static IEnumerable<TValue> NotNull<TValue>(this IEnumerable<TValue> collection)
+        public static IEnumerable<TValue> NotNull<TValue>(this IEnumerable<TValue>? collection)
         {
             return collection ?? Array.Empty<TValue>();
         }

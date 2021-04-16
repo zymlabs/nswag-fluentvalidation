@@ -162,12 +162,12 @@ namespace ZymLabs.NSwag.FluentValidation
                     {
                         // Create validation context of generic type
                         var validationContext = Activator.CreateInstance(
-                            adapterMethod.GetParameters().First().ParameterType, new object[] { null }
+                            adapterMethod.GetParameters().First().ParameterType, new object[] { null! }
                         );
                         //var validationContext = new ValidationContext<object>(null);
 
                         var includeValidator = adapterMethod
-                            .Invoke(adapter, new object[] { validationContext, null }) as IValidator;
+                            .Invoke(adapter, new object[] { validationContext, null! }) as IValidator;
 
                         if (includeValidator == null)
                         {

@@ -22,15 +22,16 @@ namespace ZymLabs.NSwag.FluentValidation.AspNetCore
         }
 
         /// <inheritdoc/>
-        public override IValidator CreateInstance(Type validatorType)
+        public override IValidator? CreateInstance(Type validatorType)
         {
             var serviceProvider = _httpContextAccessor.HttpContext.RequestServices;
             var validator = serviceProvider.GetService(validatorType) as IValidator;
 
-            if (validator == null)
-            {
-                throw new Exception("Instance of IValidator could not be created from service provider");
-            }
+            // Returns null when there isn't a validator for the type silently
+            // if (validator == null)
+            // {
+            //     throw new Exception("Instance of IValidator could not be created from service provider");
+            // }
 
             return validator;
         }

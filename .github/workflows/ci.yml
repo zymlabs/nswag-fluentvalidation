@@ -57,14 +57,14 @@ jobs:
         run: dotnet test --no-restore --no-build --verbosity normal --logger "trx" --logger "console;noprogress=true"
       
       - name: Convert test results to JUnit format
-        if: ${{ always() }}
+        if: ${{ always() && !env.ACT }}
         run: |
           dotnet tool install -g trx2junit
           export PATH="$PATH:/root/.dotnet/tools"
           trx2junit tests/**/TestResults/*.trx --output tests/TestResults/JUnit
         
       - name: Upload test results
-        if: ${{ always() }}
+        if: ${{ always() && !env.ACT }}
         uses: actions/upload-artifact@v2
         with:
           name: Test Results
@@ -123,6 +123,7 @@ jobs:
           args: docfx.json
 
       - uses: actions/upload-artifact@v2
+        if: ${{ always() && !env.ACT }}
         with:
           name: DocFX
           path: _site
@@ -182,12 +183,15 @@ jobs:
         run: dotnet pack -c Release /p:Version=$GITVERSION_NUGETVERSION -o bin/ --no-restore --no-build
               
       - name: Publish NuGet Private Packages 
+        if: ${{ !env.ACT }}
         run: dotnet nuget push bin/ --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/${{ github.repository_owner }}
 
       - name: Publish NuGet Public Packages
+        if: ${{ !env.ACT }}
         run: dotnet nuget push bin/ --api-key ${{ secrets.NUGET_PUBLIC_API_KEY }} --source ${{ secrets.NUGET_PUBLIC_FEED }}
 
       - name: Store NuGet package artifacts
+        if: ${{ !env.ACT }}
         uses: actions/upload-artifact@v2
         with:
           name: Nuget Packages

@@ -123,7 +123,7 @@ jobs:
           args: docfx.json
 
       - uses: actions/upload-artifact@v2
-        if: ${{ always() && !env.ACT }}
+        if: ${{ !env.ACT }}
         with:
           name: DocFX
           path: _site

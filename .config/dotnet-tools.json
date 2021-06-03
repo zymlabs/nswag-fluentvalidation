@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "trx2junit": {
+      "version": "1.4.1",
+      "commands": [
+        "trx2junit"
+      ]
+    }
+  }
+}

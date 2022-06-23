@@ -23,7 +23,7 @@ namespace ZymLabs.NSwag.FluentValidation
         /// <summary>
         /// Creates new instance of <see cref="FluentValidationSchemaProcessor"/>
         /// </summary>
-        /// <param name="serviceProvider">Validator factory.</param>
+        /// <param name="serviceProvider">DI Service Provider.</param>
         /// <param name="rules">External FluentValidation rules. Rule with the same name replaces default rule.</param>
         /// <param name="loggerFactory"><see cref="ILoggerFactory"/> for logging. Can be null.</param>
         public FluentValidationSchemaProcessor(IServiceProvider serviceProvider,

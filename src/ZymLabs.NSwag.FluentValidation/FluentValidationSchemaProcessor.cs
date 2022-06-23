@@ -16,21 +16,21 @@ namespace ZymLabs.NSwag.FluentValidation
     /// </summary>
     public class FluentValidationSchemaProcessor : ISchemaProcessor
     {
-        private readonly IValidatorFactory _validatorFactory;
+        private readonly IServiceProvider _serviceProvider;
         private readonly ILogger _logger;
         private readonly IReadOnlyList<FluentValidationRule> _rules;
 
         /// <summary>
         /// Creates new instance of <see cref="FluentValidationSchemaProcessor"/>
         /// </summary>
-        /// <param name="validatorFactory">Validator factory.</param>
+        /// <param name="serviceProvider">Validator factory.</param>
         /// <param name="rules">External FluentValidation rules. Rule with the same name replaces default rule.</param>
         /// <param name="loggerFactory"><see cref="ILoggerFactory"/> for logging. Can be null.</param>
-        public FluentValidationSchemaProcessor(IValidatorFactory validatorFactory,
+        public FluentValidationSchemaProcessor(IServiceProvider serviceProvider,
                                                IEnumerable<FluentValidationRule>? rules = null,
                                                ILoggerFactory? loggerFactory = null)
         {
-            _validatorFactory = validatorFactory;
+            _serviceProvider = serviceProvider;
             _logger = loggerFactory?.CreateLogger(typeof(FluentValidationSchemaProcessor)) ?? NullLogger.Instance;
             _rules = CreateDefaultRules();
 
@@ -62,7 +62,8 @@ namespace ZymLabs.NSwag.FluentValidation
 
             try
             {
-                validator = _validatorFactory.GetValidator(context.Type);
+                Type genericType = typeof(IValidator<>).MakeGenericType(context.Type);
+                validator = _serviceProvider.GetService(genericType) as IValidator;
             }
             catch (Exception e)
             {

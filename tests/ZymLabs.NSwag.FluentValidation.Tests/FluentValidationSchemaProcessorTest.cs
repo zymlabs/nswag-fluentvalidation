@@ -194,6 +194,32 @@ namespace ZymLabs.NSwag.FluentValidation.Tests
             Assert.Equal(1, schema.Properties["NotEmpty"].MinLength);
         }
         
+        [Fact]
+        public void ProcessIncludesDefaultRuleNotEmptyOnTargetClassExtended()
+        {
+            // Arrange
+            var jsonSchemaGeneratorSettings = CreateJsonSchemaGeneratorSettingsExtended();
+
+            // Act
+            var schema = JsonSchema.FromType<MockValidationTargetExtended>(jsonSchemaGeneratorSettings);
+
+            // Assert
+            // Assert.Equal(1, schema.Properties["ChildProperty"].MinLength);
+            // Assert.False(schema.Properties["ChildProperty"].IsNullable(SchemaType.OpenApi3));
+
+            Assert.Equal(1, schema.Properties["NotEmpty"].MinLength);
+            Assert.False(schema.Properties["NotEmpty"].IsNullable(SchemaType.OpenApi3));
+            
+            var notEmptyChildProperty = schema.Properties["NotEmptyChild"];
+            Assert.Empty(notEmptyChildProperty.OneOf);
+            Assert.NotNull(notEmptyChildProperty.Reference);
+            
+            // Unable to get this to work right now
+            // var notEmptyChildPropertyEnum = schema.Properties["NotEmptyChildEnum"];
+            // Assert.Empty(notEmptyChildPropertyEnum.OneOf);
+            // Assert.NotNull(notEmptyChildPropertyEnum.Reference);
+        }
+        
         private JsonSchemaGeneratorSettings CreateJsonSchemaGeneratorSettings()
         {
             var testValidator = new MockValidationTargetValidator();
@@ -206,6 +232,24 @@ namespace ZymLabs.NSwag.FluentValidation.Tests
             var fluentValidationSchemaProcessor = new FluentValidationSchemaProcessor(validatorFactory);
 
             var jsonSchemaGeneratorSettings = new JsonSchemaGeneratorSettings();
+            jsonSchemaGeneratorSettings.SchemaProcessors.Add(fluentValidationSchemaProcessor);
+
+            return jsonSchemaGeneratorSettings;
+        }
+        
+        private JsonSchemaGeneratorSettings CreateJsonSchemaGeneratorSettingsExtended()
+        {
+            var testValidator = new MockValidationTargetExtendedValidator();
+
+            var validatorFactoryMock = new Mock<IValidatorFactory>();
+            validatorFactoryMock.Setup(x => x.GetValidator(It.IsAny<Type>())).Returns(testValidator);
+
+            var validatorFactory = validatorFactoryMock.Object;
+
+            var fluentValidationSchemaProcessor = new FluentValidationSchemaProcessor(validatorFactory);
+
+            var jsonSchemaGeneratorSettings = new JsonSchemaGeneratorSettings();
+            // jsonSchemaGeneratorSettings.FlattenInheritanceHierarchy = true;
             jsonSchemaGeneratorSettings.SchemaProcessors.Add(fluentValidationSchemaProcessor);
 
             return jsonSchemaGeneratorSettings;

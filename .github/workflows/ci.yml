@@ -32,7 +32,7 @@ jobs:
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0.9.5 
         with:
-          versionSpec: '5.6.x'
+          versionSpec: '5.8.x'
 
       - name: Run GitVersion
         id: gitversion # Step id used as reference for output values
@@ -97,7 +97,7 @@ jobs:
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0.9.5 
         with:
-          versionSpec: '5.6.x'
+          versionSpec: '5.8.x'
 
       - name: Run GitVersion
         id: gitversion # Step id used as reference for output values
@@ -160,7 +160,7 @@ jobs:
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0.9.5
         with:
-          versionSpec: '5.6.x'
+          versionSpec: '5.8.x'
 
       - name: Run GitVersion
         id: gitversion # Step id used as reference for output values

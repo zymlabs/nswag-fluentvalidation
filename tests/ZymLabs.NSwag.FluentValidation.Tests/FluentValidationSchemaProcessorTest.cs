@@ -224,10 +224,10 @@ namespace ZymLabs.NSwag.FluentValidation.Tests
         {
             var testValidator = new MockValidationTargetValidator();
 
-            var validatorFactoryMock = new Mock<IValidatorFactory>();
-            validatorFactoryMock.Setup(x => x.GetValidator(It.IsAny<Type>())).Returns(testValidator);
+            var serviceProvider = new Mock<IServiceProvider>();
+            serviceProvider.Setup(x => x.GetService(It.IsAny<Type>())).Returns(testValidator);
 
-            var validatorFactory = validatorFactoryMock.Object;
+            var validatorFactory = serviceProvider.Object;
 
             var fluentValidationSchemaProcessor = new FluentValidationSchemaProcessor(validatorFactory);
 

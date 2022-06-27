@@ -16,7 +16,8 @@ namespace ZymLabs.NSwag.FluentValidation
     /// </summary>
     public class FluentValidationSchemaProcessor : ISchemaProcessor
     {
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IValidatorFactory? _validatorFactory;
+        private readonly IServiceProvider? _serviceProvider;
         private readonly ILogger _logger;
         private readonly IReadOnlyList<FluentValidationRule> _rules;
 
@@ -31,6 +32,35 @@ namespace ZymLabs.NSwag.FluentValidation
                                                ILoggerFactory? loggerFactory = null)
         {
             _serviceProvider = serviceProvider;
+            _logger = loggerFactory?.CreateLogger(typeof(FluentValidationSchemaProcessor)) ?? NullLogger.Instance;
+            _rules = CreateDefaultRules();
+
+            if (rules != null)
+            {
+                var ruleMap = _rules.ToDictionary(rule => rule.Name, rule => rule);
+
+                foreach (var rule in rules)
+                {
+                    // Add or replace rule
+                    ruleMap[rule.Name] = rule;
+                }
+
+                _rules = ruleMap.Values.ToList();
+            }
+        }
+        
+        /// <summary>
+        /// Creates new instance of <see cref="FluentValidationSchemaProcessor"/>
+        /// </summary>
+        /// <param name="validatorFactory">Validator factory.</param>
+        /// <param name="rules">External FluentValidation rules. Rule with the same name replaces default rule.</param>
+        /// <param name="loggerFactory"><see cref="ILoggerFactory"/> for logging. Can be null.</param>
+        [Obsolete("Validator factories have been deprecated. Use serviceProviders instead. See https://github.com/FluentValidation/FluentValidation/issues/1961")]
+        public FluentValidationSchemaProcessor(IValidatorFactory validatorFactory,
+                                               IEnumerable<FluentValidationRule>? rules = null,
+                                               ILoggerFactory? loggerFactory = null)
+        {
+            _validatorFactory = validatorFactory;
             _logger = loggerFactory?.CreateLogger(typeof(FluentValidationSchemaProcessor)) ?? NullLogger.Instance;
             _rules = CreateDefaultRules();
 
@@ -62,8 +92,14 @@ namespace ZymLabs.NSwag.FluentValidation
 
             try
             {
-                Type genericType = typeof(IValidator<>).MakeGenericType(context.Type);
-                validator = _serviceProvider.GetService(genericType) as IValidator;
+                if (_serviceProvider != null) {
+                    Type genericType = typeof(IValidator<>).MakeGenericType(context.Type);
+                    validator = _serviceProvider.GetService(genericType) as IValidator;
+                } else if (_validatorFactory != null) {
+                    validator = _validatorFactory.GetValidator(context.Type);
+                } else {
+                    throw new Exception("No validator factory or service provider configured");
+                }
             }
             catch (Exception e)
             {

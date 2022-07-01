@@ -58,7 +58,13 @@ public void ConfigureServices(IServiceCollection services)
     });
 
     // Add the FluentValidationSchemaProcessor as a scoped service
-    serviceCollection.AddScoped<FluentValidationSchemaProcessor>();
+    serviceCollection.AddScoped<FluentValidationSchemaProcessor>(provider =>
+    {
+        var validationRules = provider.GetService<IEnumerable<FluentValidationRule>>();
+        var loggerFactory = provider.GetService<ILoggerFactory>();
+
+        return new FluentValidationSchemaProcessor(provider, validationRules, loggerFactory);
+    });
 }
 ```
 
@@ -173,6 +179,41 @@ internal class CustomerAddressValidator : AbstractValidator<Customer>
     }
 }
 ```
+
+## Upgrading
+
+- To 0.6.0
+
+    Update the dependency injection to specify the constructor to use as there is now ambiguity with the other constructor.
+
+    ```csharp
+    System.InvalidOperationException
+        Unable to activate type 'ZymLabs.NSwag.FluentValidation.FluentValidationSchemaProcessor'. The following constructors are ambiguous:
+
+        Void .ctor(System.IServiceProvider, System.Collections.Generic.IEnumerable`1[ZymLabs.NSwag.FluentValidation.FluentValidationRule], Microsoft.Extensions.Logging.ILoggerFactory)
+
+        Void .ctor(FluentValidation.IValidatorFactory, System.Collections.Generic.IEnumerable`1[ZymLabs.NSwag.FluentValidation.FluentValidationRule], Microsoft.Extensions.Logging.ILoggerFactory)
+
+        at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteFactory.CreateConstructorCallSite(ResultCache lifetime, Type serviceType, Type implementationType, CallSiteChain callSiteChain)
+    ```
+
+    From:
+
+    ```csharp
+    serviceCollection.AddScoped<FluentValidationSchemaProcessor>();
+    ```
+
+    To:
+
+    ```csharp
+    serviceCollection.AddScoped<FluentValidationSchemaProcessor>(provider =>
+    {
+        var validationRules = provider.GetService<IEnumerable<FluentValidationRule>>();
+        var loggerFactory = provider.GetService<ILoggerFactory>();
+
+        return new FluentValidationSchemaProcessor(provider, validationRules, loggerFactory);
+    });
+    ```
 
 ## Credits
 

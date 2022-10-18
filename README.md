@@ -58,7 +58,7 @@ public void ConfigureServices(IServiceCollection services)
     });
 
     // Add the FluentValidationSchemaProcessor as a scoped service
-    serviceCollection.AddScoped<FluentValidationSchemaProcessor>(provider =>
+    services.AddScoped<FluentValidationSchemaProcessor>(provider =>
     {
         var validationRules = provider.GetService<IEnumerable<FluentValidationRule>>();
         var loggerFactory = provider.GetService<ILoggerFactory>();

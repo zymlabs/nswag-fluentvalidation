@@ -14,7 +14,7 @@ namespace ZymLabs.NSwag.FluentValidation
         public static readonly StringComparer Instance = new IgnoreAllStringComparer();
 
         /// <inheritdoc />
-        public override int Compare(string left, string right)
+        public override int Compare(string? left, string? right)
         {
             int leftIndex = 0;
             int rightIndex = 0;
@@ -35,7 +35,7 @@ namespace ZymLabs.NSwag.FluentValidation
         }
 
         /// <inheritdoc />
-        public override bool Equals(string left, string right)
+        public override bool Equals(string? left, string? right)
         {
             if (left == null || right == null)
                 return false;
@@ -74,20 +74,28 @@ namespace ZymLabs.NSwag.FluentValidation
             }
         }
 
-        internal static bool GetNextSymbol(string value, ref int startIndex, out char symbol)
+        internal static bool GetNextSymbol(string? value, ref int startIndex, out char symbol)
         {
+            symbol = char.MinValue;
+
+            if (value == null)
+            {
+                return false;
+            }
+            
             while (startIndex >= 0 && startIndex < value.Length)
             {
                 var current = value[startIndex++];
-                if (char.IsLetterOrDigit(current))
+                if (!char.IsLetterOrDigit(current))
                 {
-                    symbol = char.ToUpperInvariant(current);
-                    return true;
+                    continue;
                 }
+                
+                symbol = char.ToUpperInvariant(current);
+                return true;
             }
 
             startIndex = -1;
-            symbol = char.MinValue;
             return false;
         }
     }

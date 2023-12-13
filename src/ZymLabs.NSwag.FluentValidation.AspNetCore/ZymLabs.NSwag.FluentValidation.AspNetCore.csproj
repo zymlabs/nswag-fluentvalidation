@@ -1,16 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-      <TargetFramework>netstandard2.0</TargetFramework>
+      <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
       <Description>Use FluentValidation rules to define validation requirements for NSwag Swagger/OpenAPI schema.</Description>
-      <Copyright>Copyright (c) 2019 Zym Labs LLC</Copyright>
+      <Copyright>Copyright (c) 2023 Zym Labs LLC</Copyright>
       <PackageLicenseUrl>https://raw.githubusercontent.com/zymlabs/nswag-fluentvalidation/master/LICENSE</PackageLicenseUrl>
       <RepositoryUrl>https://github.com/zymlabs/nswag-fluentvalidation.git</RepositoryUrl>
       <RepositoryType>git</RepositoryType>
       <PackageTags>nswag; fluentvalidation; swagger; aspnetcore</PackageTags>
-      <LangVersion>8</LangVersion>
+      <LangVersion>10</LangVersion>
       <Nullable>enable</Nullable>
+      <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
+    
+    <ItemGroup>
+    </ItemGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
       <DocumentationFile>bin\Debug\ZymLabs.NSwag.FluentValidation.AspNetCore.xml</DocumentationFile>
@@ -21,9 +25,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="FluentValidation" Version="10.2.3" />
-      <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-      <PackageReference Include="System.Text.Encodings.Web" Version="4.5.1" />
+      <FrameworkReference Include="Microsoft.AspNetCore.App" />
+      <PackageReference Include="System.Text.Encodings.Web" Version="8.0.0" />
     </ItemGroup>
 
     <ItemGroup>

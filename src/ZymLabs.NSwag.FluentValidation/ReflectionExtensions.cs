@@ -62,7 +62,12 @@ namespace ZymLabs.NSwag.FluentValidation
                     }
                 }
 
-                child = child.BaseType!;
+                child = child.BaseType;
+                
+                if (child == null)
+                {
+                    return false;
+                }
             }
 
             return false;

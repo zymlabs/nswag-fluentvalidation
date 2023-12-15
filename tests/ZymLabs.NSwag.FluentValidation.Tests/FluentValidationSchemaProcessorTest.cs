@@ -231,7 +231,7 @@ namespace ZymLabs.NSwag.FluentValidation.Tests
 
             var fluentValidationSchemaProcessor = new FluentValidationSchemaProcessor(validatorFactory);
 
-            var jsonSchemaGeneratorSettings = new JsonSchemaGeneratorSettings();
+            var jsonSchemaGeneratorSettings = new SystemTextJsonSchemaGeneratorSettings();
             jsonSchemaGeneratorSettings.SchemaProcessors.Add(fluentValidationSchemaProcessor);
 
             return jsonSchemaGeneratorSettings;
@@ -248,7 +248,7 @@ namespace ZymLabs.NSwag.FluentValidation.Tests
 
             var fluentValidationSchemaProcessor = new FluentValidationSchemaProcessor(validatorFactory);
 
-            var jsonSchemaGeneratorSettings = new JsonSchemaGeneratorSettings();
+            var jsonSchemaGeneratorSettings = new SystemTextJsonSchemaGeneratorSettings();
             // jsonSchemaGeneratorSettings.FlattenInheritanceHierarchy = true;
             jsonSchemaGeneratorSettings.SchemaProcessors.Add(fluentValidationSchemaProcessor);
 

@@ -93,17 +93,17 @@ namespace ZymLabs.NSwag.FluentValidation
             try
             {
                 if (_serviceProvider != null) {
-                    Type genericType = typeof(IValidator<>).MakeGenericType(context.Type);
+                    Type genericType = typeof(IValidator<>).MakeGenericType(context.ContextualType);
                     validator = _serviceProvider.GetService(genericType) as IValidator;
                 } else if (_validatorFactory != null) {
-                    validator = _validatorFactory.GetValidator(context.Type);
+                    validator = _validatorFactory.GetValidator(context.ContextualType);
                 } else {
                     throw new Exception("No validator factory or service provider configured");
                 }
             }
             catch (Exception e)
             {
-                _logger.LogWarning(0, e, $"GetValidator for type '{context.Type}' fails");
+                _logger.LogWarning(0, e, $"GetValidator for type '{context.ContextualType}' fails");
             }
 
             // Check if a validator exists for this property
@@ -112,7 +112,7 @@ namespace ZymLabs.NSwag.FluentValidation
                 return;
             }
 
-            _logger.LogDebug($"Applying FluentValidation rules to swagger schema for type '{context.Type}'");
+            _logger.LogDebug($"Applying FluentValidation rules to swagger schema for type '{context.ContextualType}'");
 
             ApplyRulesToSchema(context, validator);
 
@@ -122,18 +122,18 @@ namespace ZymLabs.NSwag.FluentValidation
             }
             catch (Exception e)
             {
-                _logger.LogWarning(0, e, $"Applying IncludeRules for type '{context.Type}' fails");
+                _logger.LogWarning(0, e, $"Applying IncludeRules for type '{context.ContextualType}' fails");
             }
         }
 
         private void ApplyRulesToSchema(SchemaProcessorContext context, IValidator validator)
         {
-            _logger.LogDebug($"Applying FluentValidation rules to swagger schema for type '{context.Type}'");
+            _logger.LogDebug($"Applying FluentValidation rules to swagger schema for type '{context.ContextualType}'");
 
             var schema = context.Schema;
 
             // Loop through properties
-            foreach (var key in schema?.Properties?.Keys ?? Array.Empty<string>())
+            foreach (var key in schema.Properties.Keys)
             {
                 var validators = validator.GetValidatorsForMemberIgnoreCase(key);
 
@@ -141,22 +141,24 @@ namespace ZymLabs.NSwag.FluentValidation
                 {
                     foreach (var rule in _rules)
                     {
-                        if (rule.Matches(propertyValidator))
+                        if (!rule.Matches(propertyValidator))
                         {
-                            try
-                            {
-                                rule.Apply(new RuleContext(context, key, propertyValidator));
+                            continue;
+                        }
+                        
+                        try
+                        {
+                            rule.Apply(new RuleContext(context, key, propertyValidator));
 
-                                _logger.LogDebug(
-                                    $"Rule '{rule.Name}' applied for property '{context.Type.Name}.{key}'"
-                                );
-                            }
-                            catch (Exception e)
-                            {
-                                _logger.LogWarning(
-                                    0, e, $"Error on apply rule '{rule.Name}' for property '{context.Type.Name}.{key}'"
-                                );
-                            }
+                            _logger.LogDebug(
+                                $"Rule '{rule.Name}' applied for property '{context.ContextualType.Name}.{key}'"
+                            );
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.LogWarning(
+                                0, e, $"Error on apply rule '{rule.Name}' for property '{context.ContextualType.Name}.{key}'"
+                            );
                         }
                     }
                 }
@@ -204,7 +206,7 @@ namespace ZymLabs.NSwag.FluentValidation
                         //var validationContext = new ValidationContext<object>(null);
 
                         var includeValidator = adapterMethod
-                            .Invoke(adapter, new object[] { validationContext, null! }) as IValidator;
+                            .Invoke(adapter, new[] { validationContext, null! }) as IValidator;
 
                         if (includeValidator == null)
                         {
@@ -229,13 +231,10 @@ namespace ZymLabs.NSwag.FluentValidation
                 new FluentValidationRule("Required")
                 {
                     Matches = propertyValidator =>
-                        propertyValidator is INotNullValidator || propertyValidator is INotEmptyValidator,
+                        propertyValidator is INotNullValidator or INotEmptyValidator,
                     Apply = context =>
                     {
                         var schema = context.SchemaProcessorContext.Schema;
-
-                        if (schema == null)
-                            return;
 
                         if (!schema.RequiredProperties.Contains(context.PropertyKey))
                             schema.RequiredProperties.Add(context.PropertyKey);

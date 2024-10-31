@@ -17,12 +17,12 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true # Stop wasting time caching packages
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Required for gitversion to detect versionin history. See https://github.com/GitTools/actions/blob/master/docs/examples/github/gitversion/index.md
           
       - name: Setup .NET Core
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
           source-url: https://nuget.pkg.github.com/zymlabs/index.json
@@ -30,16 +30,16 @@ jobs:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.5 
+        uses: gittools/actions/gitversion/setup@v0 
         with:
           versionSpec: '5.8.x'
 
       - name: Run GitVersion
         id: gitversion # Step id used as reference for output values
-        uses: gittools/actions/gitversion/execute@v0.9.5 # Stores to GITVERSION_* environment variables
+        uses: gittools/actions/gitversion/execute@v0 # Stores to GITVERSION_* environment variables
 
       - name: Cache NuGet packages
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: | 
             ~/.nuget/packages
@@ -82,12 +82,12 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true # Stop wasting time caching packages
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Required for gitversion to detect versionin history. See https://github.com/GitTools/actions/blob/master/docs/examples/github/gitversion/index.md
           
       - name: Setup .NET Core
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
           source-url: https://nuget.pkg.github.com/zymlabs/index.json
@@ -95,16 +95,16 @@ jobs:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.5 
+        uses: gittools/actions/gitversion/setup@v0 
         with:
           versionSpec: '5.8.x'
 
       - name: Run GitVersion
         id: gitversion # Step id used as reference for output values
-        uses: gittools/actions/gitversion/execute@v0.9.5 # Stores to GITVERSION_* environment variables
+        uses: gittools/actions/gitversion/execute@v0 # Stores to GITVERSION_* environment variables
 
       - name: Cache NuGet packages
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: | 
             ~/.nuget/packages
@@ -145,12 +145,12 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true # Stop wasting time caching packages
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Required for gitversion to detect version history. See https://github.com/GitTools/actions/blob/master/docs/examples/github/gitversion/index.md
           
       - name: Setup .NET Core
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
           source-url: https://nuget.pkg.github.com/zymlabs/index.json
@@ -158,16 +158,16 @@ jobs:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.5
+        uses: gittools/actions/gitversion/setup@v0
         with:
           versionSpec: '5.8.x'
 
       - name: Run GitVersion
         id: gitversion # Step id used as reference for output values
-        uses: gittools/actions/gitversion/execute@v0.9.5 # Stores to GITVERSION_* environment variables
+        uses: gittools/actions/gitversion/execute@v0 # Stores to GITVERSION_* environment variables
 
       - name: Cache NuGet packages
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: | 
             ~/.nuget/packages

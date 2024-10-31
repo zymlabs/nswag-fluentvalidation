@@ -70,10 +70,11 @@ public void ConfigureServices(IServiceCollection services)
 
 ## Version compatibility
 
-ZymLabs.NSwag.FluentValidation | Swashbuckle.AspNetCore | FluentValidation
+ZymLabs.NSwag.FluentValidation | NSwag.AspNetCore | FluentValidation
 ---------|----------|---------
 [0.1.0, 0.4.0) | [13.0.0, 14.0.0) | >=7.2.0
-[0.4.0, 0.5.0) | [13.0.0, 14.0.0) | >=10.0.0
+[0.4.0, 0.6.0) | [13.0.0, 14.0.0) | >=10.0.0
+[0.7.0, 0.8.0) | [14.0.0, 15.0.0) | >=11.0.0
 
 ## Supported validators
 

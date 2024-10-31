@@ -183,7 +183,7 @@ jobs:
         run: dotnet build --configuration Release --no-restore
       
       - name: Pack NuGet Packages
-        run: dotnet pack -c Release /p:Version=$GITVERSION_NUGETVERSION -o bin/ --no-restore --no-build
+        run: dotnet pack -c Release /p:Version=$GitVersion_NuGetVersionV2 -o bin/ --no-restore --no-build
               
       - name: Publish NuGet Private Packages 
         if: ${{ !env.ACT }}
